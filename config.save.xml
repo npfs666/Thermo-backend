@@ -1,0 +1,40 @@
+<brasserie>
+  <modules>
+    <com.staligtredan.thermo.modele.Cuve>
+      <id>0</id>
+      <type>1</type>
+      <ds2413>
+        <address></address>
+        <name>nouveau relais</name>
+        <pioA>false</pioA>
+        <pioB>false</pioB>
+      </ds2413>
+      <ds18b20>
+        <address>KKo5RhoTAjY=</address>
+        <name>cuve 1</name>
+        <temp>19.5</temp>
+        <resolution>12</resolution>
+        <offset>0.0</offset>
+      </ds18b20>
+      <regulation>false</regulation>
+      <consigne>15.0</consigne>
+      <nomCommun> </nomCommun>
+      <dateDebut>1970-01-01 00:00:00.0 UTC</dateDebut>
+    </com.staligtredan.thermo.modele.Cuve>
+  </modules>
+  <elts>
+    <com.staligtredan.thermo.modele.TemperatureSensor reference="../../modules/com.staligtredan.thermo.modele.Cuve/ds18b20"/>
+    <com.staligtredan.thermo.modele.PowerSwitch>
+      <address>OoL3QQAAAIM=</address>
+      <name>cuve 1</name>
+      <pioA>false</pioA>
+      <pioB>false</pioB>
+    </com.staligtredan.thermo.modele.PowerSwitch>
+    <com.staligtredan.thermo.modele.PowerSwitch>
+      <address>OvsPQgAAAJ0=</address>
+      <name>circulateur</name>
+      <pioA>false</pioA>
+      <pioB>false</pioB>
+    </com.staligtredan.thermo.modele.PowerSwitch>
+  </elts>
+</brasserie>

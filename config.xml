@@ -1,0 +1,59 @@
+<brasserie>
+  <modules>
+    <com.staligtredan.thermo.modele.Cuve>
+      <id>0</id>
+      <type>1</type>
+      <ds2413>
+        <address></address>
+        <name>nouveau relais</name>
+        <pioA>false</pioA>
+        <pioB>false</pioB>
+      </ds2413>
+      <ds18b20>
+        <address></address>
+        <name>nouveau capteur</name>
+        <temp>0.0</temp>
+        <resolution>12</resolution>
+        <offset>0.0</offset>
+      </ds18b20>
+      <circulateur>
+        <address></address>
+        <name>nouveau relais</name>
+        <pioA>false</pioA>
+        <pioB>false</pioB>
+      </circulateur>
+      <regulation>false</regulation>
+      <consigne>15.0</consigne>
+      <nomCommun>nouvelle cuve</nomCommun>
+      <dateDebut>1970-01-01 00:00:00.0 UTC</dateDebut>
+    </com.staligtredan.thermo.modele.Cuve>
+    <com.staligtredan.thermo.modele.Cuve>
+      <id>1</id>
+      <type>1</type>
+      <ds2413>
+        <address></address>
+        <name>nouveau relais</name>
+        <pioA>false</pioA>
+        <pioB>false</pioB>
+      </ds2413>
+      <ds18b20>
+        <address></address>
+        <name>nouveau capteur</name>
+        <temp>0.0</temp>
+        <resolution>12</resolution>
+        <offset>0.0</offset>
+      </ds18b20>
+      <circulateur>
+        <address></address>
+        <name>nouveau relais</name>
+        <pioA>false</pioA>
+        <pioB>false</pioB>
+      </circulateur>
+      <regulation>false</regulation>
+      <consigne>15.0</consigne>
+      <nomCommun>nouvelle cuve</nomCommun>
+      <dateDebut>1970-01-01 00:00:00.0 UTC</dateDebut>
+    </com.staligtredan.thermo.modele.Cuve>
+  </modules>
+  <elts/>
+</brasserie>
