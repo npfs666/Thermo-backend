@@ -38,6 +38,27 @@ cp ./Thermo-backend/target/Thermoregulation2024-0.0.1-SNAPSHOT-jar-with-dependen
 
 #sudo cp ./thermoregulation.service /lib/systemd/system/thermoregulation.service
 sudo cp ./Thermo-backend/deploy/thermoregulation.service /lib/systemd/system/thermoregulation.service
+sudo bash -c 'echo "[Unit]
+Description=Thermoregulation
+Wants=network-online.target
+After=network-online.target
+ 
+[Service]
+Type=simple
+ 
+User=$username
+Group=$username
+WorkingDirectory=/home/$username/
+ 
+ExecStart=/usr/bin/java -jar /home/$username/thermoregulation.jar
+ 
+Restart=on-failure
+ 
+[Install]
+WantedBy=multi-user.target" > /lib/systemd/system/thermoregulation.service'
+
+
+
 
 sudo systemctl daemon-reload
 sudo systemctl enable thermoregulation.service
@@ -48,8 +69,8 @@ sudo service thermoregulation start
 # Installation du serveur WEB
 sudo apt install nginx -y
 
-sudo cp ./Thermo-backend/deploy/default /etc/nginx/sites-enabled/default
-sed "s@root /var/www/html;@root /home/$username/www;@" /etc/nginx/sites-enabled/default
+# On change le dossier www/ vers le /home
+sudo sed -i "s@root /var/www/html;@root /home/$username/www;@" /etc/nginx/sites-enabled/default
 mkdir /home/$username/www
 
 # trick pour les droits de nginx

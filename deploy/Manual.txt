@@ -1,0 +1,21 @@
+How to install :
+
+- get a fresh install on a SD card via PI Imager (enable ssh and set username && pwd)
+
+- Power up the Pi on the default port (not the UPS)
+
+- SSH into the Pi
+
+- Install git (sudo apt install git)
+
+- Git clone (git clone https://github.com/npfs666/Thermo-backend)
+
+- Authorise install script to execute (chmod +x .Thermo-backend/deploy/install.sh)
+
+- Execute install script (./Thermo-backend/deploy/install.sh)
+
+- halt pi (sudo halt)
+
+- Unplug power from Pi and set it up on UPS, then boot UPS
+
+- You're done
