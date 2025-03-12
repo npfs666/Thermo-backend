@@ -69,6 +69,10 @@ sudo apt install nginx -y
 
 # On change le dossier www/ vers le /home
 sudo sed -i "s@root /var/www/html;@root /home/$username/www;@" /etc/nginx/sites-enabled/default
+
+# MAJ des règles pour que le react-router fonctionne
+sudo sed -i "s@try_files $uri $uri/ =404;@try_files $uri /index.html;@" /etc/nginx/sites-enabled/default
+
 mkdir /home/$username/www
 
 # trick pour les droits de nginx
@@ -82,4 +86,3 @@ sudo service nginx restart
 # Déploiement du frontend WEB
 git clone https://github.com/npfs666/Thermo-frontend.git
 mv "Thermo-frontend/build"/* /home/$username/www
-#tar -xzf thermo-frontend.tar.gz -C /home/pi/www
