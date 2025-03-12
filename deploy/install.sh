@@ -32,7 +32,7 @@ sudo cp ./Thermo-backend/deploy/mosquitto.conf /etc/mosquitto/mosquitto.conf
 
 
 # Installation de java et du backend
-sudo apt install -y openjdk-11-jdk
+sudo apt install -y openjdk-17-jdk
 
 #git clone https://github.com/npfs666/Thermo-backend.git
 cp ./Thermo-backend/target/Thermoregulation2024-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/$username/thermoregulation.jar 
