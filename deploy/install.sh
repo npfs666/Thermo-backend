@@ -1,4 +1,4 @@
-#!bin/bash
+#!bin/sh
 
 # Scripts d'installation pour la thermorégul v2
 
@@ -26,17 +26,19 @@ lifepo4wered-cli set PI_SHDN_TO 50 #éteinds l'alimention après 50sec (120sec p
 
 # Installation du broker MQTT
 sudo apt-get install mosquitto
-sudo cp ./mosquitto.conf /etc/mosquitto/mosquitto.conf
+#sudo cp ./mosquitto.conf /etc/mosquitto/mosquitto.conf
+sudo cp ./Thermo-backend/deploy/mosquitto.conf /etc/mosquitto/mosquitto.conf
 
 
 
 # Installation de java et du backend
 sudo apt install -y openjdk-11-jdk
 
-git clone https://github.com/npfs666/Thermo-backend.git
-mv Thermo-backend/target/Thermoregulation2024-0.0.1-SNAPSHOT-jar-with-dependencies /home/pi/thermoregulation.jar 
+#git clone https://github.com/npfs666/Thermo-backend.git
+cp ./Thermo-backend/target/Thermoregulation2024-0.0.1-SNAPSHOT-jar-with-dependencies /home/pi/thermoregulation.jar 
 
-sudo cp ./thermoregulation.service /lib/systemd/system/thermoregulation.service
+#sudo cp ./thermoregulation.service /lib/systemd/system/thermoregulation.service
+sudo cp ./Thermo-backend/deploy/thermoregulation.service /lib/systemd/system/thermoregulation.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable thermoregulation.service
@@ -47,7 +49,7 @@ sudo service thermoregulation start
 # Installation du serveur WEB
 sudo apt install nginx
 
-sudo cp ./default /etc/nginx/sites-enabled/default
+sudo cp ./Thermo-backend/deploy/default /etc/nginx/sites-enabled/default
 
 # trick pour les droits de nginx
 gpasswd -a www-data pi
