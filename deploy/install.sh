@@ -36,9 +36,7 @@ sudo apt install -y openjdk-17-jdk -y
 #git clone https://github.com/npfs666/Thermo-backend.git
 cp ./Thermo-backend/target/Thermoregulation2024-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/$username/thermoregulation.jar 
 
-#sudo cp ./thermoregulation.service /lib/systemd/system/thermoregulation.service
-sudo cp ./Thermo-backend/deploy/thermoregulation.service /lib/systemd/system/thermoregulation.service
-sudo bash -c 'echo "[Unit]
+echo "[Unit]
 Description=Thermoregulation
 Wants=network-online.target
 After=network-online.target
@@ -55,9 +53,9 @@ ExecStart=/usr/bin/java -jar /home/$username/thermoregulation.jar
 Restart=on-failure
  
 [Install]
-WantedBy=multi-user.target" > /lib/systemd/system/thermoregulation.service'
+WantedBy=multi-user.target" > ./thermoregulation.service
 
-
+sudo mv ./thermoregulation.service /lib/systemd/system/thermoregulation.service
 
 
 sudo systemctl daemon-reload
