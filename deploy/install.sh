@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Scripts d'installation pour la thermorégul v2
-echo "quel est nom d'utilisateur ?"
+read -p 'Username: ' username
 
 
 # MAJ du système avant tout
 sudo apt update && sudo apt upgrade -y
-read username
 
 
 # Installation de l'UPS LiFePO4weredPi
@@ -25,14 +24,14 @@ lifepo4wered-cli set PI_SHDN_TO 50 #éteinds l'alimention après 50sec (120sec p
 
 
 # Installation du broker MQTT
-sudo apt-get install mosquitto
+sudo apt-get install mosquitto -y
 #sudo cp ./mosquitto.conf /etc/mosquitto/mosquitto.conf
 sudo cp ./Thermo-backend/deploy/mosquitto.conf /etc/mosquitto/mosquitto.conf
 
 
 
 # Installation de java et du backend
-sudo apt install -y openjdk-17-jdk
+sudo apt install -y openjdk-17-jdk -y
 
 #git clone https://github.com/npfs666/Thermo-backend.git
 cp ./Thermo-backend/target/Thermoregulation2024-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/$username/thermoregulation.jar 
@@ -47,14 +46,15 @@ sudo service thermoregulation start
 
 
 # Installation du serveur WEB
-sudo apt install nginx
+sudo apt install nginx -y
 
 sudo cp ./Thermo-backend/deploy/default /etc/nginx/sites-enabled/default
+sed "s@root /var/www/html;@root /home/$username/www;@" /etc/nginx/sites-enabled/default
 mkdir /home/$username/www
 
 # trick pour les droits de nginx
-gpasswd -a www-data $username
-chmod g+x /home && chmod g+x /home/$username && chmod g+x /home/$username/www
+sudo gpasswd -a www-data $username
+sudo chmod g+x /home && chmod g+x /home/$username && chmod g+x /home/$username/www
 
 sudo service nginx restart
 
@@ -62,5 +62,5 @@ sudo service nginx restart
 
 # Déploiement du frontend WEB
 git clone https://github.com/npfs666/Thermo-frontend.git
-mv Thermo-frontend/build/* /home/$username/www
+mv "Thermo-frontend/build"/* /home/$username/www
 #tar -xzf thermo-frontend.tar.gz -C /home/pi/www
