@@ -13,6 +13,13 @@ public class OneWireMaster {
 	// Liste de tous les éléments 1-wire
 	private ArrayList<OneWireElement> elts;
 	
+	/**
+	 * Hystérésis de °C pour éviter les marche/arrêt intenpestifs
+	 */
+	public static final double tempHysteresis = 0.2;
+	
+	
+	
 	public OneWireMaster() {
 		
 		modules = new ArrayList<>();

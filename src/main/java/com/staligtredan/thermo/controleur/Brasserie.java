@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -23,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import com.google.gson.Gson;
+import com.staligtredan.onewire.DS18B20;
 import com.staligtredan.onewire.DS2480B;
 import com.staligtredan.thermo.modele.OneWireMaster;
 import com.staligtredan.thermo.modele.oneWire.OneWireElement;
@@ -50,6 +52,8 @@ public class Brasserie {
 	
 	private static MqttClient client;
 	
+
+	
 	public Brasserie() {
 		
 		DS2480B.openPort("/dev/ttyAMA0", 9600);
@@ -59,11 +63,11 @@ public class Brasserie {
 		// Charge le fichier config.xml
 		loadData();
 
-		// Lance un process de régulation toute les 3sec
+		// Lance un process de régulation toute les 10sec
 		execService = Executors.newScheduledThreadPool(1);
 		execService.scheduleAtFixedRate(() -> {
 			regulation();
-		}, 1, 3, TimeUnit.SECONDS);
+		}, 1, 10, TimeUnit.SECONDS);
 		
 		try {
 			client = new MqttClient("tcp://localhost:1883", // URI
@@ -123,78 +127,107 @@ public class Brasserie {
 	/**
 	 * Cycle de régulation interne (class en daemon)
 	 */
-	private  void regulation() {
+	private  void regulation() {		
 		
-		//if( execService.isTerminated() ) return;
-		/*System.out.println("list:");
-		for( OneWireElement ts : elts ) {
-			System.out.println(ts.getAddress());
-		}*/
-		
-		// Boucle de test
-		synchronized ( master.getModules() ) {
-
+		/**
+		 * ballade dans la liste des slave et gérer en fonction du type défini
+		 * */
+		synchronized ( master ) {
+			
+			// 1 : convertion de T°C sur toutes les sondes (750ms)
+			DS18B20.convert(null, false, null);
+			try {
+				Thread.sleep(750);
+			} catch ( InterruptedException e ) {
+				Logger.getLogger(DS2480B.class.getName()).log(Level.WARNING, "Sleep problem");
+			}
+			
+			// 2 : lire toutes les sondes de T°C
+			for ( OneWireElement sm : Brasserie.getElements() ) {
+				
+				if( sm.getClass().equals(TemperatureSensor.class) ) {
+					
+					((TemperatureSensor) sm).readTemperature();
+				}
+			}
+			
+			// 3 : réguler les cuves
+			boolean atLeastOne = false;
+			ArrayList<PowerSwitch> circulateurList = new ArrayList<>();
+			
 			for ( SlaveModule sm : master.getModules() ) {
 
 				if( sm.getType() == Cuve.typeCuve ) {
 
 					Cuve c = (Cuve) sm;
-
-					if( c.getConsigne() <= c.getDs18b20().getTemp() ) {
-
-						c.setActive(true);
-					} else {
+					
+					if( c.isRegulation() ) {
+						
+						// Allumer si T°C >= consigne
+						if( c.getDs18b20().getTemp() >= c.getConsigne() ) {
+							c.setActive(true);
+							atLeastOne = true;
+							circulateurList.add(c.getCirculateur());
+						} 
+						// Eteindre si T°C + hyst < consigne
+						else if ( (c.getDs18b20().getTemp() + OneWireMaster.tempHysteresis) < c.getConsigne() ) {
+							c.setActive(false);
+						}
+						
+						if( c.isActive() ) {
+							atLeastOne = true;
+							circulateurList.add(c.getCirculateur());
+						}
+					} 
+					else {
 						c.setActive(false);
 					}
 				}
 			}
 			
-			
+			// 3bis : faire une pause avant de lancer le circulateur si au moins une pompe est active
+			// 4 : lancer la liste de "circulateurs" crée au dessus
+			// faut éclaircir la structure des données ici (pas vraiment de slave module circulateur
+			// on peut aussi juste parcourir la liste est allumer tous les circulateurs
+			if( atLeastOne ) {
+				
+				// Tempo avant la mise en route du circulateur pour attendre ques les vannes soient ouvertes
+				try {
+					Thread.sleep(3000);
+				} catch ( InterruptedException e ) {
+					Logger.getLogger(DS2480B.class.getName()).log(Level.WARNING, "Sleep problem");
+				}
+				
+				// Allumer circulateur
+				for ( SlaveModule sm : master.getModules() ) {
+
+					if( sm.getType() == Cuve.typeCuve ) {
+						
+						Cuve c = (Cuve) sm;
+						
+						c.getCirculateur().setPioB(true);
+						break;
+					}
+				}
+				
+			} else {
+				
+				// éteindre circulateur
+				for ( SlaveModule sm : master.getModules() ) {
+
+					if( sm.getType() == Cuve.typeCuve ) {
+						
+						Cuve c = (Cuve) sm;
+						
+						c.getCirculateur().setPioB(false);
+						break;
+					}
+				}
+			}
+
+			// 5 : envoyer les nouvelles valeurs sur le MQTT
+			publishOneWireElements();
 		}
-		
-		publishOneWireElements();
-		
-		/**
-		 * ballade dans la liste des slave et gérer en fonction du type défini*/
-		// 1 : convertion de T°C sur toutes les sondes (750ms)
-		// 2 : lire toutes les sondes de T°C
-		// 3 : réguler les cuves
-		// 4 : lancer la liste de "circulateurs" crée au dessus
-		// 5 : envoyer les nouvelles valeurs sur le MQTT
-		
-		/*synchronized ( modules ) {
-			
-			for (SlaveModule sm : modules ) {
-				
-				if( sm.getDs18b20().getAdress() != null ) {
-					
-					DS18B20.setResolution(sm.getDs18b20().getAdress(), sm.getDs18b20().getResolution());
-					DS18B20.convert(sm.getDs18b20().getAdress(), false, null);
-				}
-			}
-			
-			
-			// tempo de convertion de T°C (750ms max)
-			for (SlaveModule sm : modules ) {
-				
-				if( sm.getDs18b20().getAdress() != null ) {
-					
-					sm.getDs18b20().setTemp(DS18B20.readTemp(sm.getDs18b20().getAdress()));
-				}
-			}
-			
-			
-			
-			for (SlaveModule sm : modules ) {
-				
-				
-				// Si c'est une cuve on régule
-				if( sm.getClass() == Cuve.class) {
-					
-				}
-			}
-		}*/
-		
 	}
 
 

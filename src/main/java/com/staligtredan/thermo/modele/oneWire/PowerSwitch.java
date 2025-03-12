@@ -1,5 +1,7 @@
 package com.staligtredan.thermo.modele.oneWire;
 
+import com.staligtredan.onewire.DS2413;
+
 /** 
 * @author Brendan
 * @since v1.0
@@ -24,6 +26,7 @@ public class PowerSwitch extends OneWireElement {
 
 	public void setPioA(boolean pioA) {
 		this.pioA = pioA;
+		DS2413.setOutputs(getAddress(), pioA, pioB);
 	}
 
 	public boolean isPioB() {
@@ -32,5 +35,6 @@ public class PowerSwitch extends OneWireElement {
 
 	public void setPioB(boolean pioB) {
 		this.pioB = pioB;
+		DS2413.setOutputs(getAddress(), pioA, pioB);
 	}
 }

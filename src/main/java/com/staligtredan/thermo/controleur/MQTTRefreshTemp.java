@@ -1,7 +1,5 @@
 package com.staligtredan.thermo.controleur;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,16 +24,41 @@ public class MQTTRefreshTemp implements IMqttMessageListener {
 		 */
 		if( (message != null) && (message.getPayload().length > 0) ) {
 			
-			// get address
-			//System.out.println(new String(message.getPayload()));
+			// get address // clean string
 			String s = new String(message.getPayload()).replaceAll(":\"", ":[");
 			s = s.replaceAll("\"}", "]}");
-			//System.out.println(s);
 			OneWireElement owe = new Gson().fromJson(s, OneWireElement.class);
 
 			System.out.println("refresh temp : "+DS2480B.print(owe.getAddress()));
 			Brasserie.publishLog("refresh temp : "+DS2480B.print(owe.getAddress()));
 
+			// search for sensor in database
+			TemperatureSensor ts = null;
+			for ( OneWireElement sm : Brasserie.getElements() ) {
+				if( Arrays.equals(sm.getAddress(), owe.getAddress()) ) {
+					ts = (TemperatureSensor) sm;
+				}
+			}
+			
+			long time = System.currentTimeMillis();
+			
+			// Config and convert
+			ts.convertTemperature();
+			
+			System.out.println("Résol + convert = "+(System.currentTimeMillis()-time)+" ms");
+			Brasserie.publishLog("Résol + convert = "+(System.currentTimeMillis()-time)+" ms");
+			
+			// Wait convert time
+			try {
+				Thread.sleep(DS18B20.conversionTimeMs(ts.getResolution()));
+			} catch ( InterruptedException e ) {
+				Logger.getLogger(DS2480B.class.getName()).log(Level.WARNING, "Sleep problem");
+			}
+			
+			// read and format temperature
+			ts.readTemperature();
+			
+			/**
 			// Config and convert
 			long time = System.currentTimeMillis();
 			for (OneWireElement sm : Brasserie.getElements() ) {
@@ -65,7 +88,7 @@ public class MQTTRefreshTemp implements IMqttMessageListener {
 					BigDecimal bd = new BigDecimal(d).setScale(2, RoundingMode.HALF_UP);
 					ts.setTemp(bd.doubleValue());
 				}
-			}
+			}*/
 		}
 
 		Brasserie.publishOneWireElements();

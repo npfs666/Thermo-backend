@@ -10,7 +10,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>Thermoregulation2024</name>
-	<!-- FIXME change it to the project's website -->
 	<url>http://www.arstaligtredan.fr</url>
 
 	<properties>
@@ -68,14 +67,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.13.0</version>
 				<configuration>
 					<release>11</release>
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.7.1</version>
 				<executions>
 					<execution>
 						<id>jar-with-dependencies</id>

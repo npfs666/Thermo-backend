@@ -1,5 +1,10 @@
 package com.staligtredan.thermo.modele.oneWire;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import com.staligtredan.onewire.DS18B20;
+
 /** 
 * @author Brendan
 * @since v1.0
@@ -37,5 +42,17 @@ public class TemperatureSensor extends OneWireElement {
 	}
 	public void setOffset(float offset) {
 		this.offset = offset;
+	}
+	
+	public void convertTemperature() {
+		
+		DS18B20.setResolution(getAddress(), getResolution());
+		DS18B20.convert(getAddress(), false, null);
+	}
+	
+	public void readTemperature() {
+		double d = DS18B20.readTemp(getAddress()) + getOffset();
+		BigDecimal bd = new BigDecimal(d).setScale(2, RoundingMode.HALF_UP);
+		setTemp(bd.doubleValue());
 	}
 }
