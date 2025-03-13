@@ -67,7 +67,7 @@ public class Brasserie {
 		execService = Executors.newScheduledThreadPool(1);
 		execService.scheduleAtFixedRate(() -> {
 			regulation();
-		}, 1, 10, TimeUnit.SECONDS);
+		}, 4, 120, TimeUnit.SECONDS);
 		
 		try {
 			client = new MqttClient("tcp://localhost:1883", // URI
@@ -193,7 +193,7 @@ public class Brasserie {
 				
 				// Tempo avant la mise en route du circulateur pour attendre ques les vannes soient ouvertes
 				try {
-					Thread.sleep(3000);
+					Thread.sleep(30000);
 				} catch ( InterruptedException e ) {
 					Logger.getLogger(DS2480B.class.getName()).log(Level.WARNING, "Sleep problem");
 				}
