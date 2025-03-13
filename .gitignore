@@ -7,4 +7,4 @@
 /target/surefire-reports
 /target/test-classes
 /target/
-build.xml*
+/build.xml
