@@ -6,7 +6,7 @@
 	<property name="raspberrypi" value="192.168.1.13" />
 	<property name="raspberryfolder" value="~" />
 	<property name="username" value="gaou" />
-	<property name="password" value="oiub8re1" />
+	<property name="password" value="" />
 
 	<path id="maven-ant-tasks.classpath" path="${ant.libs.dir}/maven-ant-tasks-2.1.3.jar" />
 
