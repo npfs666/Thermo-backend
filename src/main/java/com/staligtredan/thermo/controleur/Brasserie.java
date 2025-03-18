@@ -167,11 +167,13 @@ public class Brasserie {
 						if( c.getDs18b20().getTemp() >= c.getConsigne() ) {
 							c.setActive(true);
 							atLeastOne = true;
+							c.getDs2413().setPioB(true);
 							circulateurList.add(c.getCirculateur());
 						} 
 						// Eteindre si T°C + hyst < consigne
 						else if ( (c.getDs18b20().getTemp() + OneWireMaster.tempHysteresis) < c.getConsigne() ) {
 							c.setActive(false);
+							c.getDs2413().setPioB(false);
 						}
 						
 						if( c.isActive() ) {
@@ -181,6 +183,7 @@ public class Brasserie {
 					} 
 					else {
 						c.setActive(false);
+						c.getDs2413().setPioB(false);
 					}
 				}
 			}
