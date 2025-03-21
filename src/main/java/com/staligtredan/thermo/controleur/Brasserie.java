@@ -137,7 +137,7 @@ public class Brasserie {
 			// 1 : convertion de T°C sur toutes les sondes (750ms)
 			DS18B20.convert(null, false, null);
 			try {
-				Thread.sleep(750);
+				Thread.sleep(DS18B20.conversionTime12Bits);
 			} catch ( InterruptedException e ) {
 				Logger.getLogger(DS2480B.class.getName()).log(Level.WARNING, "Sleep problem");
 			}
