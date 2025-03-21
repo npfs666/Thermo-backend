@@ -1,5 +1,7 @@
 package com.staligtredan.thermo.controleur;
 
+import java.util.logging.Level;
+
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -16,7 +18,8 @@ public class MQTTList1WireAddr implements IMqttMessageListener {
 	public void messageArrived( String topic, MqttMessage message ) throws Exception {
 		
 		DS2480B.searchROMs();
-		System.out.println("Search 1 wire network");
+		//System.out.println("Search 1 wire network");
+		Brasserie.publishLog(Level.INFO, "Search 1 wire network");
 		
 		for( byte[] address : DS2480B.OWList ) {
 			
@@ -29,8 +32,11 @@ public class MQTTList1WireAddr implements IMqttMessageListener {
 				if( ow == null ) {
 					TemperatureSensor ts = new TemperatureSensor(address);
 					Brasserie.getElements().add(ts);
+					Brasserie.publishLog(Level.INFO, "Added DS18B20 "+ DS2480B.print(ts.getAddress()));
 				}	
-				
+				else {
+					Brasserie.publishLog(Level.INFO, "Found DS18B20 "+ DS2480B.print(ow.getAddress()));
+				}
 			}
 			else if( address[0] == DS2413.familyCode ) {
 				
@@ -39,18 +45,21 @@ public class MQTTList1WireAddr implements IMqttMessageListener {
 				OneWireElement ow = Brasserie.oneWireElementExist(address);
 				if( ow == null ) {
 					PowerSwitch ts = new PowerSwitch(address);
-					
-					
-					
+
 					Brasserie.getElements().add(ts);
+					Brasserie.publishLog(Level.INFO, "Found DS2413 "+ DS2480B.print(ts.getAddress()));
 					
-					
-				}		
+				}
+				else {
+					Brasserie.publishLog(Level.INFO, "Found DS2413 "+ DS2480B.print(ow.getAddress()));
+				}
 			}			
 		}
 		
 		
-		System.out.println("OWElement found : " + Brasserie.getElements().size());
+		//System.out.println("OWElement found : " + Brasserie.getElements().size());
+		Brasserie.publishLog(Level.INFO, "OWElement found : " + DS2480B.OWList.size());
+		Brasserie.publishLog(Level.INFO, "OWElement declared : " + Brasserie.getElements().size());
 		
 		Brasserie.publishOneWireElements();
 	}

@@ -13,8 +13,10 @@ import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -56,18 +58,22 @@ public class Brasserie {
 	
 	public Brasserie() {
 		
+		setLogger();
+		
 		DS2480B.openPort("/dev/ttyAMA0", 9600);
 		
 		master = new OneWireMaster();
 		
 		// Charge le fichier config.xml
 		loadData();
+		
+		
 
 		// Lance un process de régulation toute les 10sec
 		execService = Executors.newScheduledThreadPool(1);
 		execService.scheduleAtFixedRate(() -> {
 			regulation();
-		}, 4, 120, TimeUnit.SECONDS);
+		}, 4, 40, TimeUnit.SECONDS);
 		
 		try {
 			client = new MqttClient("tcp://localhost:1883", // URI
@@ -269,9 +275,30 @@ public class Brasserie {
 		publishSlaves();
 	}
 	
+
+
+	public void setLogger() {
+
+		Logger logger = Logger.getLogger("MyLog");
+		FileHandler fh;
+
+		try {
+			// This block configure the logger with handler and formatter
+			fh = new FileHandler("./thermo.log");
+			logger.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+
+		} catch ( SecurityException e ) {
+			e.printStackTrace();
+		} catch ( IOException e ) {
+			e.printStackTrace();
+		}
+	}
 	
-	public static void publishLog(String log) {
+	public static void publishLog(Level lvl, String log) {
 		
+		Logger.getLogger("MyLog").log(lvl, log);
 		MqttMessage reqMessage = new MqttMessage(new Gson().toJson(log).getBytes());
 		reqMessage.setRetained(false);
 		reqMessage.setQos(2);

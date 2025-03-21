@@ -1,6 +1,7 @@
 package com.staligtredan.thermo.controleur;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -22,8 +23,8 @@ public class MQTTSetSwitch implements IMqttMessageListener {
 			s = s.replaceAll("\",", "],");
 
 			PowerSwitch owe = new Gson().fromJson(s, PowerSwitch.class);
-			System.out.println("SET PIO ("+DS2480B.print(owe.getAddress())+") PioA:"+owe.isPioA()+" PioB: "+owe.isPioB());
-			Brasserie.publishLog("SET PIO ("+DS2480B.print(owe.getAddress())+") PioA:"+owe.isPioA()+" PioB: "+owe.isPioB());
+			//System.out.println("SET PIO ("+DS2480B.print(owe.getAddress())+") PioA:"+owe.isPioA()+" PioB: "+owe.isPioB());
+			Brasserie.publishLog(Level.INFO, "SET PIO ("+DS2480B.print(owe.getAddress())+") PioA:"+owe.isPioA()+" PioB: "+owe.isPioB());
 			
 			// set local model
 			for (OneWireElement sm : Brasserie.getElements() ) {

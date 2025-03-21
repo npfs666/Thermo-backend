@@ -29,8 +29,8 @@ public class MQTTRefreshTemp implements IMqttMessageListener {
 			s = s.replaceAll("\"}", "]}");
 			OneWireElement owe = new Gson().fromJson(s, OneWireElement.class);
 
-			System.out.println("refresh temp : "+DS2480B.print(owe.getAddress()));
-			Brasserie.publishLog("refresh temp : "+DS2480B.print(owe.getAddress()));
+			//System.out.println("refresh temp : "+DS2480B.print(owe.getAddress()));
+			Brasserie.publishLog(Level.INFO, "refresh temp : "+DS2480B.print(owe.getAddress()));
 
 			// search for sensor in database
 			TemperatureSensor ts = null;
@@ -45,8 +45,8 @@ public class MQTTRefreshTemp implements IMqttMessageListener {
 			// Config and convert
 			ts.convertTemperature();
 			
-			System.out.println("Résol + convert = "+(System.currentTimeMillis()-time)+" ms");
-			Brasserie.publishLog("Résol + convert = "+(System.currentTimeMillis()-time)+" ms");
+			//System.out.println("Résol + convert = "+(System.currentTimeMillis()-time)+" ms");
+			Brasserie.publishLog(Level.INFO, "Résol + convert = "+(System.currentTimeMillis()-time)+" ms");
 			
 			// Wait convert time
 			try {
